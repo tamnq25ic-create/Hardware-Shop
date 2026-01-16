@@ -22,6 +22,15 @@ public class Register extends javax.swing.JPanel {
     public Register() {
         initComponents();
     }
+    private boolean isValidPassword(String password, String username) {
+    if (password.length() < 8) return false;
+    if (!password.matches(".*[A-Z].*")) return false; // chữ hoa
+    if (!password.matches(".*[a-z].*")) return false; // chữ thường
+    if (!password.matches(".*\\d.*")) return false;    // số
+    if (!password.matches(".*[@#$!%*?&].*")) return false; // đặc biệt
+    if (password.toLowerCase().contains(username.toLowerCase())) return false;
+    return true;
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -161,7 +170,17 @@ public class Register extends javax.swing.JPanel {
         JOptionPane.showMessageDialog(this, "Mật khẩu không khớp!");
         return;
     }
-
+    if (!isValidPassword(password, username)) {
+    JOptionPane.showMessageDialog(
+        this,
+        "Mật khẩu phải:\n"
+      + "- Ít nhất 8 ký tự\n"
+      + "- Có chữ hoa, chữ thường\n"
+      + "- Có số và ký tự đặc biệt\n"
+      + "- Không chứa username"
+    );
+    return;
+}
     UserDAO dao = new UserDAO();
 
     if (dao.existByEmailOrPhone(email)) {

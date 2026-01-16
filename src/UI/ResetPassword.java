@@ -6,6 +6,7 @@ import UI.LoginFrame;
 import dao.UserDAO;
 import javax.swing.JOptionPane;
 import management.Session;
+import util.SecurityUtil;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -26,6 +27,15 @@ public class ResetPassword extends javax.swing.JFrame {
     public ResetPassword() {
         initComponents();
     }
+    private boolean isValidPassword(String password) {
+    if (password.length() < 8) return false;
+    if (!password.matches(".*[A-Z].*")) return false;
+    if (!password.matches(".*[a-z].*")) return false;
+    if (!password.matches(".*\\d.*")) return false;
+    if (!password.matches(".*[@#$!%*?&].*")) return false;
+    return true;
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -133,9 +143,21 @@ public class ResetPassword extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this, "Mật khẩu không khớp!");
         return;
     }
+    // validate độ mạnh
+    if (!isValidPassword(newPass)) {
+    JOptionPane.showMessageDialog(
+        this,
+        "Mật khẩu phải:\n"
+      + "- Ít nhất 8 ký tự\n"
+      + "- Có chữ hoa, chữ thường\n"
+      + "- Có số và ký tự đặc biệt"
+    );
+    return;
+}
 
     // 👉 Hash mật khẩu trước khi lưu
-    String hashedPass = management.HashUtil.hashPassword(newPass);
+    String hashedPass = SecurityUtil.hashPassword(newPass);
+
 
     UserDAO dao = new UserDAO();
     boolean ok = dao.updatePasswordById(Session.resetUserId, hashedPass);
