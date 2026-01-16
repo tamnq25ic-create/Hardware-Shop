@@ -134,12 +134,15 @@ public class ResetPassword extends javax.swing.JFrame {
         return;
     }
 
+    // 👉 Hash mật khẩu trước khi lưu
+    String hashedPass = management.HashUtil.hashPassword(newPass);
+
     UserDAO dao = new UserDAO();
-    boolean ok = dao.updatePasswordById(Session.resetUserId, newPass);
+    boolean ok = dao.updatePasswordById(Session.resetUserId, hashedPass);
 
     if (ok) {
         JOptionPane.showMessageDialog(this, "Đổi mật khẩu thành công!");
-        Session.resetOTP = null;
+        Session.forgotOTP = null;
         Session.resetUserId = 0;
         new LoginFrame().setVisible(true);
         this.dispose();

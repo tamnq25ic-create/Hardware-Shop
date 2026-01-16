@@ -10,6 +10,7 @@ import java.sql.Connection;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import util.SecurityUtil;
 /**
  *
  * @author ACER
@@ -257,7 +258,10 @@ public class MUser extends javax.swing.JPanel {
         PreparedStatement ps = con.prepareStatement(
             "UPDATE Users SET password=? WHERE id=?"
         );
-        ps.setString(1, "123456");
+        String defaultPassword = "123456";
+        String hashedPassword = SecurityUtil.hashPassword(defaultPassword);
+        ps.setString(1, hashedPassword);
+
         ps.setInt(2, appuserPK);
         ps.executeUpdate();
 

@@ -6,7 +6,10 @@ package UI;
 
 import dao.UserDAO;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import management.Session;
+import management.HashUtil;
+
 
 /**
  *
@@ -84,24 +87,30 @@ public class VerifyRegisterOTP extends javax.swing.JFrame {
 
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
         // TODO add your handling code here:
-        if (!txtOtp.getText().equals(Session.registerOTP)) {
-        JOptionPane.showMessageDialog(this, "OTP sai!");
+        String enteredOTP = txtOtp.getText().trim();
+    if(!enteredOTP.equals(Session.registerOTP)) {
+        JOptionPane.showMessageDialog(this, "OTP không đúng!");
         return;
     }
 
-    UserDAO dao = new UserDAO();
-    boolean ok = dao.insertPendingUser(
-        Session.pendingUsername,
-        Session.pendingEmail,
-        Session.pendingPassword
-    );
+    // Lưu user vào database
+    String username = Session.pendingUsername;
+    String email = Session.pendingEmail;
+    String passwordHash = Session.pendingPassword; // hash đã được tạo ở Register
 
-    if (ok) {
+   // Hash mật khẩu trước khi lưu
+            
+
+    UserDAO dao = new UserDAO();
+    boolean success = dao.insertPendingUser(username, email, passwordHash); // lưu hash
+    
+
+    if(success) {
         JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
         new LoginFrame().setVisible(true);
-        dispose();
+        SwingUtilities.getWindowAncestor(this).dispose();
     } else {
-        JOptionPane.showMessageDialog(this, "Lỗi đăng ký!");
+        JOptionPane.showMessageDialog(this, "Lỗi khi đăng ký!");
     }
     }//GEN-LAST:event_btnVerifyActionPerformed
 

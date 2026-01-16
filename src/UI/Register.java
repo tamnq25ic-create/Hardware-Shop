@@ -7,6 +7,7 @@ import dao.UserDAO;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import management.Session;
+import util.SecurityUtil;
 
 
 /**
@@ -147,42 +148,43 @@ public class Register extends javax.swing.JPanel {
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
         // TODO add your handling code here:
         String username = txtUsername.getText().trim();
-String email = txtEmail.getText().trim();
-String password = new String(txtPassword.getPassword());
-String confirm = new String(txtConfirm.getPassword());
+    String email = txtEmail.getText().trim();
+    String password = new String(txtPassword.getPassword());
+    String confirm = new String(txtConfirm.getPassword());
 
-if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
-    JOptionPane.showMessageDialog(this, "Nhập thiếu thông tin!");
-    return;
-}
+    if (username.isEmpty() || email.isEmpty() || password.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Nhập thiếu thông tin!");
+        return;
+    }
 
-if (!password.equals(confirm)) {
-    JOptionPane.showMessageDialog(this, "Mật khẩu không khớp!");
-    return;
-}
+    if (!password.equals(confirm)) {
+        JOptionPane.showMessageDialog(this, "Mật khẩu không khớp!");
+        return;
+    }
 
-UserDAO dao = new UserDAO();
+    UserDAO dao = new UserDAO();
 
-if (dao.existByEmailOrPhone(email)) {
-    JOptionPane.showMessageDialog(this, "Email/SĐT đã tồn tại!");
-    return;
-}
+    if (dao.existByEmailOrPhone(email)) {
+        JOptionPane.showMessageDialog(this, "Email/SĐT đã tồn tại!");
+        return;
+    }
 
-// 👉 Sinh OTP
-String otp = String.valueOf((int)(Math.random() * 900000 + 100000));
+    // 👉 Sinh OTP
+    String otp = String.valueOf((int)(Math.random() * 900000 + 100000));
 
-// 👉 Lưu tạm
-Session.registerOTP = otp;
-Session.pendingUsername = username;
-Session.pendingEmail = email;
-Session.pendingPassword = password;
+    // 👉 Lưu tạm
+    String hashedPassword = SecurityUtil.hashPassword(password); // HASH ngay
+    Session.registerOTP = otp;
+    Session.pendingUsername = username;
+    Session.pendingEmail = email;
+    Session.pendingPassword = hashedPassword;  // lưu hash
 
-// 👉 Demo gửi OTP
-JOptionPane.showMessageDialog(this, "OTP đăng ký: " + otp);
+    // 👉 Demo gửi OTP
+    JOptionPane.showMessageDialog(this, "OTP đăng ký: " + otp);
 
-// 👉 Mở màn hình nhập OTP
-new VerifyRegisterOTP().setVisible(true);
-SwingUtilities.getWindowAncestor(this).dispose();
+    // 👉 Mở màn hình nhập OTP
+    new VerifyRegisterOTP().setVisible(true);
+    SwingUtilities.getWindowAncestor(this).dispose();
 
     }//GEN-LAST:event_btnRegisterActionPerformed
 

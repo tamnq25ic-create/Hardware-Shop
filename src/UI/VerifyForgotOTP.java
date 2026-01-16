@@ -4,6 +4,7 @@
  */
 package UI;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import management.Session;
 
 /**
@@ -99,27 +100,15 @@ public class VerifyForgotOTP extends javax.swing.JFrame {
 
     private void btnVerifyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerifyActionPerformed
         // TODO add your handling code here:
-         String inputOTP = txtOTP.getText().trim();
-
-        if (inputOTP.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập OTP!");
+          String enteredOTP = txtOTP.getText().trim();
+        if(!enteredOTP.equals(Session.forgotOTP)) {
+            JOptionPane.showMessageDialog(this, "OTP không đúng!");
             return;
         }
 
-        if (inputOTP.equals(Session.forgotOTP)) {
-
-    if (Session.resetUserId == 0) {
-        JOptionPane.showMessageDialog(this, "Lỗi phiên đặt lại mật khẩu!");
-        return;
-    }
-
-    JOptionPane.showMessageDialog(this, "OTP hợp lệ!");
-    new ResetPassword().setVisible(true);
-    this.dispose();
-
-} else {
-    JOptionPane.showMessageDialog(this, "OTP không đúng!");
-}
+        // OTP đúng → mở màn hình đổi mật khẩu
+        new ResetPassword().setVisible(true);
+        SwingUtilities.getWindowAncestor(this).dispose();
     }//GEN-LAST:event_btnVerifyActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
