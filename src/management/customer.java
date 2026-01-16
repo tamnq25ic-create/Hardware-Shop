@@ -24,7 +24,7 @@ public class customer extends javax.swing.JPanel {
      */
     public customer() {
     initComponents();
-    c_search.setEditable(false); 
+    c_search.setEditable(true); 
     // Tắt chọn ô
     jTable1.setCellSelectionEnabled(false);
     jTable1.setColumnSelectionAllowed(false);
@@ -106,6 +106,7 @@ public class customer extends javax.swing.JPanel {
 
         c_name.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         c_name.setText("0");
+        c_name.addActionListener(this::c_nameActionPerformed);
 
         c_tp.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         c_tp.setText("0");
@@ -307,48 +308,67 @@ public class customer extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
                                    
 
-    String name = c_name.getText();
-    String tp   = c_tp.getText();
+   String name = c_name.getText().trim();
+    String tp   = c_tp.getText().trim();
+
+    if(name.isEmpty() || tp.isEmpty()){
+        JOptionPane.showMessageDialog(this, "Không được để trống!");
+        return;
+    }
 
     try {
         Connection con = ConnectionDB.getConnection();
-        Statement s = con.createStatement();
+        PreparedStatement ps = con.prepareStatement(
+            "INSERT INTO Customer(c_name, tp_number) VALUES (?, ?)"
+        );
 
-        String sql = "INSERT INTO Customer(c_name, tp_number) VALUES ('" + name + "', '" + tp + "')";
-        s.executeUpdate(sql);
+        ps.setString(1, name);
+        ps.setString(2, tp);
 
-        JOptionPane.showMessageDialog(null, "Save!");
+        ps.executeUpdate();
+
+        JOptionPane.showMessageDialog(this, "Save!");
         tb_load();
+
         c_name.setText("");
         c_tp.setText("");
         c_search.setText("");
-    
+
     } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+        JOptionPane.showMessageDialog(this, e.getMessage());
     }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        
-        String search= c_search.getText();
-        
-        try {
-        Connection con = ConnectionDB.getConnection();
-        Statement s = con.createStatement();
+       String search = c_search.getText().trim();
 
-        String sql = "SELECT * FROM Customer WHERE cid = '" + search + "'";
-        ResultSet rs = s.executeQuery(sql);
+if(search.isEmpty()){
+    JOptionPane.showMessageDialog(this, "Vui lòng nhập ID!");
+    return;
+}
 
-        if (rs.next()) {
-            c_name.setText(rs.getString("c_name"));
-            c_tp.setText(rs.getString("tp_number"));
-        } else {
-            JOptionPane.showMessageDialog(null, "Không tìm thấy khách hàng!");
-        }
+try {
+    Connection con = ConnectionDB.getConnection();
 
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+    PreparedStatement ps = con.prepareStatement(
+        "SELECT * FROM Customer WHERE cid=?"
+    );
+    ps.setInt(1, Integer.parseInt(search));
+
+    ResultSet rs = ps.executeQuery(); // ⚠️ THIẾU DÒNG NÀY
+
+    if (rs.next()) {
+        c_name.setText(rs.getString("c_name"));
+        c_tp.setText(rs.getString("tp_number"));
+    } else {
+        JOptionPane.showMessageDialog(this, "Không tìm thấy khách hàng!");
     }
+
+} catch (NumberFormatException e){
+    JOptionPane.showMessageDialog(this, "ID phải là số!");
+} catch (SQLException e) {
+    JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+}
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -458,6 +478,10 @@ public class customer extends javax.swing.JPanel {
 
 
     }//GEN-LAST:event_c_search_tbKeyReleased
+
+    private void c_nameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c_nameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_c_nameActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
