@@ -45,6 +45,7 @@ public class Home extends javax.swing.JFrame {
 
         case "employee":
             jToggleButton9.setVisible(false);
+            jToggleButton8.setVisible(false);
             break;
 
         case "admin":
