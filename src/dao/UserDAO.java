@@ -6,6 +6,7 @@
     import java.sql.Connection;
     import java.sql.PreparedStatement;
     import java.sql.ResultSet;
+import management.HashUtil;
     import management.User;
     /**
      *
@@ -29,15 +30,18 @@
         return false;
     }
 
-    // Login bằng username hoặc email, password đã hash
-    public User loginByAny(String input, String passwordHash) {
+    // Login bằng username hoặc email, password plaintext (sẽ hash trong DAO)
+    public User loginByAny(String input, String password) {
         String sql = "SELECT * FROM Users WHERE (username=? OR email=?) AND password=?";
         try (Connection con = ConnectionProvider.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, input);
             ps.setString(2, input);
-            ps.setString(3, passwordHash);
+
+            // Hash password nhập trước khi so sánh với DB
+            String hashedPass = HashUtil.hashPassword(password);
+            ps.setString(3, hashedPass);
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -56,7 +60,7 @@
         return null;
     }
 
-    // Lưu user mới (hash mật khẩu đã được tạo ở Register)
+    // Lưu user mới (password đã hash từ Register)
     public boolean insertPendingUser(String username, String email, String passwordHash) {
         String sql = "INSERT INTO Users(username, email, password, role, status) VALUES (?, ?, ?, 'USER', 'Active')";
         try (Connection con = ConnectionProvider.getConnection();
@@ -64,7 +68,7 @@
 
             ps.setString(1, username);
             ps.setString(2, email);
-            ps.setString(3, passwordHash); // lưu hash
+            ps.setString(3, passwordHash);
             return ps.executeUpdate() > 0;
 
         } catch (Exception e) {
@@ -111,7 +115,7 @@
         return null;
     }
 
-    // Update mật khẩu theo id (mật khẩu đã hash)
+    // Update mật khẩu theo id (password đã hash)
     public boolean updatePasswordById(int userId, String newPasswordHash) {
         String sql = "UPDATE Users SET password=? WHERE id=?";
         try (Connection con = ConnectionProvider.getConnection();

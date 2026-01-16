@@ -108,7 +108,7 @@ public class VerifyForgotOTP extends javax.swing.JFrame {
 
         // OTP đúng → mở màn hình đổi mật khẩu
         new ResetPassword().setVisible(true);
-        SwingUtilities.getWindowAncestor(this).dispose();
+        this.dispose();
     }//GEN-LAST:event_btnVerifyActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed

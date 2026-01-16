@@ -24,6 +24,7 @@ public class VerifyRegisterOTP extends javax.swing.JFrame {
      */
     public VerifyRegisterOTP() {
         initComponents();
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -108,7 +109,7 @@ public class VerifyRegisterOTP extends javax.swing.JFrame {
     if(success) {
         JOptionPane.showMessageDialog(this, "Đăng ký thành công!");
         new LoginFrame().setVisible(true);
-        SwingUtilities.getWindowAncestor(this).dispose();
+        this.dispose();
     } else {
         JOptionPane.showMessageDialog(this, "Lỗi khi đăng ký!");
     }

@@ -70,6 +70,7 @@ public class MUser extends javax.swing.JPanel {
         jButton2 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jComboBox2 = new javax.swing.JComboBox<>();
+        jButton3 = new javax.swing.JButton();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -108,6 +109,9 @@ public class MUser extends javax.swing.JPanel {
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "admin", "employee", "user" }));
         jComboBox2.addActionListener(this::jComboBox2ActionPerformed);
 
+        jButton3.setText("Add");
+        jButton3.addActionListener(this::jButton3ActionPerformed);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -120,10 +124,12 @@ public class MUser extends javax.swing.JPanel {
                         .addGap(49, 49, 49)
                         .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(124, 124, 124)
+                        .addGap(97, 97, 97)
                         .addComponent(jButton1)
-                        .addGap(98, 98, 98)
-                        .addComponent(jButton2))
+                        .addGap(36, 36, 36)
+                        .addComponent(jButton2)
+                        .addGap(33, 33, 33)
+                        .addComponent(jButton3))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(49, 49, 49)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -163,7 +169,8 @@ public class MUser extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(jButton3))
                 .addGap(207, 207, 207))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -281,10 +288,60 @@ public class MUser extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox2ActionPerformed
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+       String username = jTextField1.getText().trim();
+    String password = jTextField2.getText().trim();
+    String status = jComboBox1.getSelectedItem().toString();
+    String role = jComboBox2.getSelectedItem().toString(); // chọn role admin/employee
+
+    if(username.isEmpty() || password.isEmpty()){
+        JOptionPane.showMessageDialog(this, "Username và Password không được để trống!");
+        return;
+    }
+
+    try(Connection con = ConnectionDB.getConnection()) {
+        // Kiểm tra username đã tồn tại chưa
+        PreparedStatement check = con.prepareStatement("SELECT id FROM Users WHERE username=?");
+        check.setString(1, username);
+        ResultSet rs = check.executeQuery();
+        if(rs.next()){
+            JOptionPane.showMessageDialog(this, "Username đã tồn tại!");
+            return;
+        }
+
+        // Hash password
+        String hashedPass = SecurityUtil.hashPassword(password);
+
+        // Thêm user mới
+        PreparedStatement ps = con.prepareStatement(
+            "INSERT INTO Users(username, password, status, role) VALUES (?, ?, ?, ?)"
+        );
+        ps.setString(1, username);
+        ps.setString(2, hashedPass);
+        ps.setString(3, status);
+        ps.setString(4, role);
+
+        int inserted = ps.executeUpdate();
+        if(inserted > 0){
+            JOptionPane.showMessageDialog(this, "Tạo user thành công!");
+            loadUsers(); // refresh bảng
+            jTextField1.setText("");
+            jTextField2.setText("");
+        } else {
+            JOptionPane.showMessageDialog(this, "Tạo user thất bại!");
+        }
+
+    } catch(Exception e){
+        JOptionPane.showMessageDialog(this, e);
+    }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JComboBox<String> jComboBox2;
     private javax.swing.JLabel jLabel1;
