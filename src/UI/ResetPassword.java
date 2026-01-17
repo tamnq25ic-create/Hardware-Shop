@@ -26,6 +26,7 @@ public class ResetPassword extends javax.swing.JFrame {
      */
     public ResetPassword() {
         initComponents();
+         setLocationRelativeTo(null);
     }
     private boolean isValidPassword(String password) {
     if (password.length() < 8) return false;
